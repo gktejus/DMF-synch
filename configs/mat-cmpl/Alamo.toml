@@ -1,0 +1,5 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-cmpl/Alamo_gt.pt" 
+shape = [1731, 1731] 
+obs_path = "datasets/mat-cmpl/Alamo_obs.pt" 
+dataset = "Alamo" 
