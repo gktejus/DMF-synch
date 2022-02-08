@@ -51,6 +51,7 @@ python main.py --log_dir /tmp --print_config \
     --config configs/dynamics.toml \
     --set depth 2
 ```
+python main.py --print_config --log_dir "./test" --config configs/opt/grouprmsprop.toml --config configs/
 
 
 The results will be saved at `/tmp/ID`, where `ID` is a different number for each run and startsfrom 0.  
@@ -73,7 +74,6 @@ For multiple experiments on nuclear norm minimization:
     --template 'python main.py --print_config --log_dir LOGDIR --config configs/mat-cmpl/run.toml --config configs/mat-cmpl/SAMPLES.toml --config configs/opt/cvx.toml' \
     --replace SAMPLES=2000,5000
 ```
-
 # Plotting
 
 We use the Jupyter notebook `plot.ipynb` to generate our figures. 
@@ -81,3 +81,12 @@ We use the Jupyter notebook `plot.ipynb` to generate our figures.
 Please modify 4-th cell to load all results. The directories are the corresponding `--log_dir` option, e.g., `/tmp/exp1` in the first example. 
  
 
+./scripts/run.rb --n_jobs 1 --name mat-cmpl \
+    --template 'python main.py --print_config --log_dir ./cauchy/ --config configs/mat-cmpl/CONFIG.toml --config configs/opt/grouprmsprop.toml --set depth DEPTH --set lr LR --set init_scale SCALE --set seed 42  --set n_iters 500000' \
+    --replace LR=0.001,0.0003 \
+    --replace DEPTH=2 \
+    --replace SCALE=1.e-3 \
+    --replace CONFIG=Ellis_Island,Alamo,Gendarmenmarkt,Madrid_Metropolis,Montreal_Notre_Dame,Notre_Dame,NYC_Library,Piazza_del_Popolo,Piccadilly,Roman_Forum,Tower_of_London,Trafalgar,Union_Square,Yorkminster
+
+
+python main.py --print_config --log_dir ./test/ --config configs/opt/grouprmsprop.toml --config configs/mat-cmpl/NYC_Library.toml  --set depth 2 --set init_scale 1.e-3 --set lr 0.0003  --set seed 42
