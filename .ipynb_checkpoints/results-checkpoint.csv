@@ -1,0 +1,13 @@
+,Exp,depth,init_scale,optimizer,initialization,lr,dataset,mean_error,median_error
+0,0,2,0.001,GroupRMSprop,gaussian,0.001,Alamo,8.40819,2.96429
+0,1,2,0.001,GroupRMSprop,gaussian,0.001,Tower_of_London,8.36558,3.97311
+0,2,2,0.001,GroupRMSprop,gaussian,0.001,Piccadilly,31.633,17.8842
+0,3,2,0.001,GroupRMSprop,gaussian,0.001,Notre_Dame,7.56845,3.12274
+0,4,2,0.001,GroupRMSprop,gaussian,0.001,Montreal_Notre_Dame,8.04147,1.92368
+0,5,2,0.001,GroupRMSprop,gaussian,0.001,Yorkminster,9.39748,5.11676
+0,6,2,0.001,GroupRMSprop,gaussian,0.001,NYC_Library,8.34239,5.27509
+0,7,2,0.001,GroupRMSprop,gaussian,0.001,Madrid_Metropolis,12.49,6.80149
+0,8,2,0.001,GroupRMSprop,gaussian,0.001,Piazza_del_Popolo,14.8886,3.18424
+0,9,2,0.001,GroupRMSprop,gaussian,0.001,Gendarmenmarkt,50.1946,25.5967
+0,10,2,0.001,GroupRMSprop,gaussian,0.001,Union_Square,30.1086,10.8366
+0,11,2,0.001,GroupRMSprop,gaussian,0.001,Roman_Forum,19.2327,13.9193

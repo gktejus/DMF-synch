@@ -53,7 +53,7 @@ for i=1:1
     [U,~,V] = svd(M(3*i-2:3*i,:))
     R(:,:,i)=U*V'; % nearest orthogonal matrix
     if (det(R(:,:,i))<0)
-        R(:,:,i)=-U*V';
+        R(:,:,i)=-U*V'
     end
 end
 
