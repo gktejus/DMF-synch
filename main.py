@@ -167,11 +167,10 @@ class MatrixCompletion(BaseProblem):
         # return (self.w_gt - e2e.cuda()).reshape(-1).pow(2).mean() , residual
         return loss , residual 
     
-    def get_eval_loss(self , e2e , ground_truth, ncams,  method = "median"):
-        e2e = e2e.detach().cpu().numpy()
-        R = torch.from_numpy(convert_mat(e2e , ncams).transpose(2,0,1))
-        gt = torch.from_numpy(ground_truth.transpose(2,0,1))
-        E_mean , E_median , E_var = compare_rot_graph(R , gt , method = method)
+    def get_eval_loss(self , e2e , ground_truth, ncams, idx, method = "median"):
+        R = torch.from_numpy(convert_mat(e2e.detach().clone().cpu().numpy() , ncams).transpose(2,0,1))
+        gt = ground_truth.detach().clone()
+        E_mean , E_median , E_var = compare_rot_graph(R , gt , idx,method = method)
         return (E_mean , E_median , E_median)
 
 
@@ -265,7 +264,7 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     # criterion = torch.nn.L1Loss()
     
     
-    ground_truth = scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['R_gt_c']
+    ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['R_gt_c'].transpose(2,0,1))
     ncams = scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['ncams_c'][0][0]
     method = "median"
     
@@ -291,8 +290,8 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
                 else:
                     adjusted_lr = optimizer.param_groups[0]['lr']
 
-                E_mean , E_median , E_var = prob.get_eval_loss(e2e, ground_truth, ncams , method=method)
-                
+                E_mean , E_median , E_var = prob.get_eval_loss(e2e, ground_truth, ncams ,T, method=method)
+                print(ground_truth)
 
                 _log.info(f"Iter #{T}: train = {loss.item():.3e}, test = {test_loss.item():.3e}, Mean = {E_mean}, Median = {E_median}, Var = {E_var}")
                 # if(E_mean==0):

@@ -8,3 +8,5 @@ wandb/*
 test/*
 MATLAB_SO3/datasets_matrices/*
 MATLAB_SO3/datasets_snavely/*
+.ipynb_checkpoints
+__pycache__

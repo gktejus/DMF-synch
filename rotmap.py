@@ -4,6 +4,7 @@ import scipy
 import torch
 import random
 import time
+import os
 from torch._C import dtype
 torchpi = torch.acos(torch.zeros(1)).item() * 2
 
@@ -51,7 +52,7 @@ def w2R(w):
     return R
 
 
-def compare_rot_graph(R1, R2, method="median"):
+def compare_rot_graph(R1, R2, idx,method="median"):
     sigma2 = (5 * torchpi / 180) * (5 * torchpi / 180)
     N = R1.shape[0]
     Emeanbest = float("Inf")
@@ -108,11 +109,20 @@ def compare_rot_graph(R1, R2, method="median"):
         e = e * 180 / torchpi
         E = torch.stack([torch.mean(e), torch.median(
             e), torch.sqrt(torch.mm(e.t(), e)/len(e))[0, 0]])
-        if E[1] < Emeanbest:
+        if E[0] < Emeanbest:
             Ebest = E
-            Emeanbest = E[2]
+            Emeanbest = E[0]
 
     E_mean, E_median, E_var = Ebest[0].item(), Ebest[1].item(), Ebest[2].item()
+    if(E_mean==0):
+        debug_path = "./debug/"+str(idx)+"/"
+        os.mkdir(debug_path)
+        torch.save(R1 , os.path.join(debug_path , "R1.npy"))
+        torch.save(R2, os.path.join(debug_path, "R2.npy"))
+
+
+
+
     return E_mean, E_median, E_var
 
 
