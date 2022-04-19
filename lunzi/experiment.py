@@ -38,11 +38,11 @@ def set_random_seed(seed: int):
 
     np.random.seed(seed)
 
-    try:
-        import tensorflow
-        tensorflow.set_random_seed(seed)
-    except ImportError:
-        pass
+    # try:
+    #     import tensorflow
+    #     tensorflow.set_random_seed(seed)
+    # except ImportError:
+    #     pass
 
     try:
         import torch
