@@ -164,6 +164,14 @@ class MatrixCompletion(BaseProblem):
         residual = (self.w_gt - e2e.cuda()).reshape(-1)  
         return loss , residual 
     
+    def get_unobs_loss(self , e2e , criterion=None):
+        self.ys_unobs = e2e[self.us_unobs,self.vs_unobs]
+        if FLAGS.loss_fn == "l1":
+            loss = criterion(self.ys_unobs.to(device).float() , self.ys_unobs_.float()) 
+        else:
+            loss = (self.ys_unobs.to(device) - self.ys_unobs_).pow(2).mean()
+        return loss 
+
     def get_eval_loss(self , e2e , ground_truth, ncams, method = "median"):
         R = torch.from_numpy(convert_mat(e2e.detach().clone().cpu().numpy() , ncams).transpose(2,0,1))
         gt = ground_truth.detach().clone()
@@ -265,7 +273,9 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['R_gt_c'].transpose(2,0,1))
     ncams = scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['ncams_c'][0][0]
     method = "median"
-    
+    E_mean_best = 0 
+    E_median_best = 0 
+    E_var_best = 0 
     for T in range(n_iters):
         # print(T)
         e2e = get_e2e(model)
@@ -278,7 +288,8 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
         wandb.log({"train_loss":loss.item()})
         with torch.no_grad():
             test_loss , residual_test= prob.get_test_loss(e2e, alpha = alpha , scale = scale, criterion = criterion)
-            
+            unobs_loss = prob.get_unobs_loss(e2e , criterion)
+
            
 
             if T % FLAGS.n_dev_iters == 0 or loss.item() <= train_thres:
@@ -288,51 +299,46 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
                 else:
                     adjusted_lr = optimizer.param_groups[0]['lr']
 
-                E_mean , E_median , E_var = prob.get_eval_loss(e2e, ground_truth, ncams ,T, method=method)
-                print(ground_truth)
+                E_mean , E_median , E_var = prob.get_eval_loss(e2e, ground_truth, ncams , method=method)
 
                 _log.info(f"Iter #{T}: train = {loss.item():.3e}, test = {test_loss.item():.3e}, Mean = {E_mean}, Median = {E_median}, Var = {E_var}")
-                # if(E_mean==0):
-                #     torch.save(convert_mat(e2e.detach().cpu().numpy() , ncams),"../msp_rot_avg/e2e.npy")
-                #     break
+        
                 _writer.add_scalar('loss/train', loss.item(), global_step=T)
                 _writer.add_scalar('loss/test', test_loss, global_step=T)
                 _writer.add_scalar('loss/E_Mean', E_mean, global_step=T)
                 _writer.add_scalar('loss/E_Median', E_median, global_step=T)
                 _writer.add_scalar('loss/E_Var', E_var, global_step=T)
-   
+                _writer.add_scalar('loss/Unobs_loss',unobs_loss,global_step=T)
+
                 wandb.log({"test_loss":test_loss.item()})
                 wandb.log({"lr":adjusted_lr})
                 wandb.log({"E_Mean":E_mean})
                 wandb.log({"E_Median":E_median})
                 wandb.log({"E_Var":E_var})
+                wandb.log({"Unobs_loss":unobs_loss})
 
-                # torch.save(residual_test , _fs.resolve("$LOGDIR/res_final_test.pt"))
-                # torch.save(residual_train , _fs.resolve("$LOGDIR/res_final_train.pt"))
 
-                if(test_loss.item()<best_loss):
+                if(E_mean<E_mean_best):
                     torch.save(e2e, _fs.resolve("$LOGDIR/best.npy"))
-                    # torch.save(residual_test , _fs.resolve("$LOGDIR/res_best_test.pt"))
-                    # torch.save(residual_train , _fs.resolve("$LOGDIR/res_best_train.pt"))
-                    best_loss = test_loss.item()
+                    E_mean_best = E_Mean
+                    E_mean_best = E_Median
+                    E_var_best = E_var
+
                 
                 if loss.item() <= train_thres:
                     break
         optimizer.step()
 
-    _log.info(f"train loss = {loss.item()}. test loss = {test_loss.item()}")
+    _log.info(f"train loss = {loss.item()}. test loss = {test_loss.item()} E_mean = {E_mean_best} E_median = {E_median_best} E_Var = {E_var_best}")
     torch.save(e2e, _fs.resolve("$LOGDIR/final.npy"))
 
+    wandb.run.summary["E_mean_best"] = E_mean_best
+    wandb.run.summary["E_median_best"] = E_median_best
+    wandb.run.summary["E_var_best"] = E_var_best
 
-    """Save the matrix in .mat for evaluation later in MATLAB"""
-   
-    # final_mat = torch.load(final_path).detach().cpu().numpy()
-    # best_mat = torch.load(best_path).detach().cpu().numpy()
-    # ndic = {'best': best_mat, 'final':final_mat}
-    # scipy.io.savemat(new_file_dir , ndic)
-   
     os.remove(final_path)
     os.remove(best_path)
+
     run.finish()
 
 
