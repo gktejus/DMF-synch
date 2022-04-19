@@ -144,7 +144,7 @@ class MatrixCompletion(BaseProblem):
     ys: torch.Tensor
 
     @FLAGS.inject
-    def __init__(self, *, gt_path, obs_path):
+    def __init__(self, *, gt_path, obs_path,unobs_path):
         self.w_gt = torch.load(gt_path, map_location=device)
         (self.us, self.vs), self.ys_ = torch.load(obs_path, map_location=device)
         (self.us_unobs , self.vs_unobs) , self.ys_unobs_ = torch.load(unobs_path, map_location=device)
