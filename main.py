@@ -34,6 +34,7 @@ class FLAGS(lz.BaseFLAGS):
     initialization = 'gaussian'  # `orthogonal` or `identity` or `gaussian`
     lr = 0.01
     train_thres = 1.e-5
+    loss_fn="l1"
 
     hidden_sizes = []
 
@@ -50,7 +51,6 @@ def get_e2e(model):
         assert isinstance(fc, nn.Linear) and fc.bias is None
         if weight is None:
             weight = fc.weight.t()
-#             weight = F.softsign(weight)
         else:
             weight = fc(weight)            
     return weight
@@ -150,27 +150,24 @@ class MatrixCompletion(BaseProblem):
     def get_train_loss(self, e2e,alpha = None , scale = None ,  criterion=None):
         self.ys = e2e[self.us, self.vs]
         residual = (self.ys - self.ys_).type(torch.float32)
-        # loss = torch.mean(robust_loss_pytorch.general.lossfun(residual,alpha =alpha  , scale = scale)) ##Cauchy
-        loss = criterion(self.ys.to(device).float() , self.ys_.float()) ##Huber
-        # loss = (self.ys.to(device) - self.ys_).pow(2).mean() ## L2
-        residual = (self.ys.to(device) - self.ys_)
-        
-
+        if FLAGS.loss_fn == "l1":
+            loss = criterion(self.ys.to(device).float() , self.ys_.float()) 
+        else:
+            loss = (self.ys.to(device) - self.ys_).pow(2).mean()
         return (loss , residual)
 
     def get_test_loss(self, e2e,alpha = None  , scale = None ,criterion=None):
-        loss = criterion(self.w_gt , e2e.to(device)) ## Huber
-        # residual =(self.w_gt  - e2e).type(torch.float32)
-        # loss = torch.mean(robust_loss_pytorch.general.lossfun(residual , alpha= alpha , scale = scale))
-        # return loss
+        if FLAGS.loss_fn == "l1":
+            loss = criterion(self.w_gt , e2e.to(device))
+        else:
+            loss =  (self.w_gt - e2e.cuda()).reshape(-1).pow(2).mean()
         residual = (self.w_gt - e2e.cuda()).reshape(-1)  
-        # return (self.w_gt - e2e.cuda()).reshape(-1).pow(2).mean() , residual
         return loss , residual 
     
-    def get_eval_loss(self , e2e , ground_truth, ncams, idx, method = "median"):
+    def get_eval_loss(self , e2e , ground_truth, ncams, method = "median"):
         R = torch.from_numpy(convert_mat(e2e.detach().clone().cpu().numpy() , ncams).transpose(2,0,1))
         gt = ground_truth.detach().clone()
-        E_mean , E_median , E_var = compare_rot_graph(R , gt , idx,method = method)
+        E_mean , E_median , E_var = compare_rot_graph(R , gt ,method = method)
         return (E_mean , E_median , E_median)
 
 
@@ -222,15 +219,16 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
         return
     else:
         raise ValueError
-    run_name = f"{FLAGS.dataset}_LR_{FLAGS.lr}_opt_{FLAGS.optimizer}_init_{FLAGS.initialization}_depth_{FLAGS.depth}_scale_{FLAGS.init_scale}"
+    #run_name = f"{FLAGS.dataset}_LR_{FLAGS.lr}_opt_{FLAGS.optimizer}_init_{FLAGS.initialization}_depth_{FLAGS.depth}_scale_{FLAGS.init_scale}"
     wandb.login(key="***REMOVED***")
-    run = wandb.init(project="mc-rot" ,name = run_name )
+    run = wandb.init(project="mc-rot")
     wandb.config.lr = FLAGS.lr
     wandb.config.optimizer = FLAGS.optimizer
     wandb.config.initialization = FLAGS.initialization
     wandb.config.init_scale = FLAGS.init_scale
     wandb.config.depth = FLAGS.depth
     wandb.config.dataset = FLAGS.dataset
+    wandb.config.loss_fn = FLAGS.loss_fn
 
     final_path = _fs.resolve("$LOGDIR/final.npy")
     best_path = _fs.resolve("$LOGDIR/best.npy")
