@@ -35,8 +35,13 @@ class FLAGS(lz.BaseFLAGS):
     lr = 0.01
     train_thres = 1.e-5
     loss_fn="l1"
-    unobs_path=''
+    # act = "tanh"
+    unobs_path= ''
     incomp_path=''
+    fraction_missing=0
+    outlier_probabilty=0
+    cameras=0
+    # project_name=""
     hidden_sizes = []
 
     @classmethod
@@ -52,9 +57,24 @@ def get_e2e(model):
         assert isinstance(fc, nn.Linear) and fc.bias is None
         if weight is None:
             weight = fc.weight.t()
+            # weight = act(weight)
         else:
-            weight = fc(weight)            
+            weight = (fc(weight))            
     return weight
+
+def get_e2e_rand(model, input):
+    model.double()
+    weight = input.double()
+    for fc in model.children():
+        assert isinstance(fc, nn.Linear) and fc.bias is None
+        if weight is None:
+            weight = fc.weight.t()
+        else:
+            weight = fc(weight)
+    return weight
+        
+  
+
 
 
 @FLAGS.inject
@@ -144,38 +164,54 @@ class MatrixCompletion(BaseProblem):
     ys: torch.Tensor
 
     @FLAGS.inject
-    def __init__(self, *, gt_path, obs_path,unobs_path):
+    def __init__(self, *, gt_path, obs_path , unobs_path, incomp_path):
         self.w_gt = torch.load(gt_path, map_location=device)
         (self.us, self.vs), self.ys_ = torch.load(obs_path, map_location=device)
-        (self.us_unobs , self.vs_unobs) , self.ys_unobs_ = torch.load(unobs_path, map_location=device)
-        
+        (self.us_un , self.vs_un) , self.ys_un = torch.load(unobs_path ,map_location=device )
+        # self.incomp_mat = torch.load(incomp_path, map_location=device)
+
     def get_train_loss(self, e2e,alpha = None , scale = None ,  criterion=None):
         self.ys = e2e[self.us, self.vs]
         residual = (self.ys - self.ys_).type(torch.float32)
-        if FLAGS.loss_fn == "l1":
-            loss = criterion(self.ys.to(device).float() , self.ys_.float()) 
+        if FLAGS.loss_fn=="l1":
+            loss = criterion(self.ys.to(device).float(), self.ys_.float())
         else:
-            loss = (self.ys.to(device) - self.ys_).pow(2).mean()
+            loss = (self.ys.to(device) - self.ys_).pow(2).mean() # L2
+        # loss = torch.mean(robust_loss_pytorch.general.lossfun(residual,alpha =alpha  , scale = scale)) # Cauchy
+       # loss = criterion(self.ys.to(device).float() , self.ys_.float()) # Huber / L1
+        # loss = (self.ys.to(device) - self.ys_).pow(2).mean() # L2
+
         return (loss , residual)
 
     def get_test_loss(self, e2e,alpha = None  , scale = None ,criterion=None):
+        residual = (e2e.to(device)- self.w_gt ).reshape(-1)
         if FLAGS.loss_fn == "l1":
-            loss = criterion(self.w_gt , e2e.to(device))
+            loss = criterion(self.w_gt , e2e.to(device)) # Huber / L1
         else:
-            loss =  (self.w_gt - e2e.cuda()).reshape(-1).pow(2).mean()
-        residual = (self.w_gt - e2e.cuda()).reshape(-1)  
-        return loss , residual 
-    
-    def get_unobs_loss(self , e2e , criterion=None):
-        self.ys_unobs = e2e[self.us_unobs,self.vs_unobs]
-        if FLAGS.loss_fn == "l1":
-            loss = criterion(self.ys_unobs.to(device).float() , self.ys_unobs_.float()) 
-        else:
-            loss = (self.ys_unobs.to(device) - self.ys_unobs_).pow(2).mean()
-        return loss 
+            loss = (self.w_gt - e2e.to(device)).reshape(-1).pow(2).mean()
+        #loss = criterion(self.w_gt , e2e.to(device)) # Huber / L1
+        # loss = torch.mean(robust_loss_pytorch.general.lossfun(residual , alpha= alpha , scale = scale))
+        # loss = (self.w_gt - e2e.to(device)).reshape(-1).pow(2).mean()
 
+        return loss , residual 
+
+    def unobserved_loss(self , e2e , criterion):
+        pred =e2e.detach().clone()
+        val = pred[self.us_un, self.vs_un]
+        if FLAGS.loss_fn == "l1":
+            loss = criterion(val.to(device).float() , self.ys_un.float())
+        else:
+            loss = (val.to(device).float() - self.ys_un.float()).pow(2).mean()  # L2
+        #loss = criterion(val.to(device).float() , self.ys_un.float())
+        # loss = (val.to(device).float() - self.ys_un.float()).pow(2).mean()  # L2
+        return loss
+        
+    
     def get_eval_loss(self , e2e , ground_truth, ncams, method = "median"):
-        R = torch.from_numpy(convert_mat(e2e.detach().clone().cpu().numpy() , ncams).transpose(2,0,1))
+        temp = e2e.detach().clone().cpu().numpy()
+        for i in range(0 , temp.shape[0] , 3):
+            temp[i:i+3 , i:i+3] = np.eye(3)
+        R = torch.from_numpy(convert_mat( temp, ncams).transpose(2,0,1))
         gt = ground_truth.detach().clone()
         E_mean , E_median , E_var = compare_rot_graph(R , gt ,method = method)
         return (E_mean , E_median , E_median)
@@ -230,18 +266,21 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     else:
         raise ValueError
     #run_name = f"{FLAGS.dataset}_LR_{FLAGS.lr}_opt_{FLAGS.optimizer}_init_{FLAGS.initialization}_depth_{FLAGS.depth}_scale_{FLAGS.init_scale}"
-    wandb.login(key="***REMOVED***")
-    run = wandb.init(project="mc-rot")
+    run = wandb.init(project="big-depth")
     wandb.config.lr = FLAGS.lr
+    wandb.config.loss_fn=FLAGS.loss_fn
     wandb.config.optimizer = FLAGS.optimizer
     wandb.config.initialization = FLAGS.initialization
     wandb.config.init_scale = FLAGS.init_scale
     wandb.config.depth = FLAGS.depth
     wandb.config.dataset = FLAGS.dataset
     wandb.config.loss_fn = FLAGS.loss_fn
+    wandb.config.act = "None"
+    wandb.config.cameras = FLAGS.cameras
+    wandb.config.outlier_probability = FLAGS.outlier_probabilty
+    wandb.config.fraction_missing = FLAGS.fraction_missing
 
-    final_path = _fs.resolve("$LOGDIR/final.npy")
-    best_path = _fs.resolve("$LOGDIR/best.npy")
+   
     log_path =  _fs.resolve("$LOGDIR")
     new_file_dir = os.path.join(log_path , "X_output.mat")
     config_path = os.path.join(log_path, "config.toml")
@@ -267,20 +306,24 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     alpha = torch.Tensor([0]).to(device)
     scale = torch.Tensor([0.1]).to(device)
 
-    best_loss  = 999999
-    criterion = torch.nn.HuberLoss(delta = 0.5)
-    # criterion = torch.nn.L1Loss()
+    best_E_mean  = 999999
+    best_E_var = 0
+    best_E_med = 0 
+    # criterion = torch.nn.HuberLoss(delta = 0.5)
+    if FLAGS.loss_fn == "l1":
+        criterion = torch.nn.L1Loss()
+    else:
+        criterion = None
     
     
     ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['R_gt_c'].transpose(2,0,1))
-    ncams = scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['ncams_c'][0][0]
+    ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['ncams_c'][0][0]
     method = "median"
-    E_mean_best = 0 
-    E_median_best = 0 
-    E_var_best = 0 
+    
     for T in range(n_iters):
-        # print(T)
+        # return get_e2e(self.net,self.input+t.randn(self.input.shape).cuda()*1e-2)
         e2e = get_e2e(model)
+        #e2e = get_e2e_rand(model, prob.incomp_mat +torch.randn(prob.incomp_mat.shape).to(device)*1e-2)
 
         loss, residual_train = prob.get_train_loss(e2e, alpha = alpha , scale = scale, criterion = criterion )
         
@@ -290,8 +333,7 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
         wandb.log({"train_loss":loss.item()})
         with torch.no_grad():
             test_loss , residual_test= prob.get_test_loss(e2e, alpha = alpha , scale = scale, criterion = criterion)
-            unobs_loss = prob.get_unobs_loss(e2e , criterion)
-
+            unobs_loss = prob.unobserved_loss(e2e , criterion)
            
 
             if T % FLAGS.n_dev_iters == 0 or loss.item() <= train_thres:
@@ -303,44 +345,47 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
 
                 E_mean , E_median , E_var = prob.get_eval_loss(e2e, ground_truth, ncams , method=method)
 
-                _log.info(f"Iter #{T}: train = {loss.item():.3e}, test = {test_loss.item():.3e}, Mean = {E_mean}, Median = {E_median}, Var = {E_var}")
-        
+                _log.info(f"Iter #{T}: train = {loss.item():.3e}, test = {test_loss.item():.3e}, Mean = {E_mean}, Median = {E_median}, Var = {E_var}, lr = {adjusted_lr}")
+
                 _writer.add_scalar('loss/train', loss.item(), global_step=T)
                 _writer.add_scalar('loss/test', test_loss, global_step=T)
                 _writer.add_scalar('loss/E_Mean', E_mean, global_step=T)
                 _writer.add_scalar('loss/E_Median', E_median, global_step=T)
                 _writer.add_scalar('loss/E_Var', E_var, global_step=T)
-                _writer.add_scalar('loss/Unobs_loss',unobs_loss,global_step=T)
+                _writer.add_scalar('loss/Unobs_Loss', unobs_loss, global_step=T)
 
                 wandb.log({"test_loss":test_loss.item()})
                 wandb.log({"lr":adjusted_lr})
                 wandb.log({"E_Mean":E_mean})
                 wandb.log({"E_Median":E_median})
                 wandb.log({"E_Var":E_var})
-                wandb.log({"Unobs_loss":unobs_loss})
-
-
-                if(E_mean<E_mean_best):
-                    torch.save(e2e, _fs.resolve("$LOGDIR/best.npy"))
-                    E_mean_best = E_Mean
-                    E_mean_best = E_Median
-                    E_var_best = E_var
-
+                wandb.log({"Unobs_Loss":unobs_loss})
                 
+
+            
+
+                if(E_mean<best_E_mean):
+                    torch.save(e2e, _fs.resolve("$LOGDIR/best.npy"))
+                  
+                    best_E_mean = E_mean
+                    best_E_med = E_median
+                    best_E_var = E_var
+
                 if loss.item() <= train_thres:
                     break
         optimizer.step()
 
-    _log.info(f"train loss = {loss.item()}. test loss = {test_loss.item()} E_mean = {E_mean_best} E_median = {E_median_best} E_Var = {E_var_best}")
+    _log.info(f"train loss = {loss.item()}. test loss = {test_loss.item()}")
+    _log.info(f"E_mean = {best_E_mean}, E_median = {best_E_med} , E_var = {best_E_var}")
     torch.save(e2e, _fs.resolve("$LOGDIR/final.npy"))
+    run.summary["E_Mean"] = best_E_mean
+    run.summary["E_Median"] = best_E_med
+    run.summary["E_Var"] = best_E_var
 
-    wandb.run.summary["E_mean_best"] = E_mean_best
-    wandb.run.summary["E_median_best"] = E_median_best
-    wandb.run.summary["E_var_best"] = E_var_best
-
-    os.remove(final_path)
-    os.remove(best_path)
-
+   
+ 
+   
+   
     run.finish()
 
 
