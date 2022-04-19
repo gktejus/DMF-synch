@@ -7,7 +7,6 @@ import time
 import os
 from torch._C import dtype
 torchpi = torch.acos(torch.zeros(1)).item() * 2
-import scipy.sparse.linalg
 
 # original implementation from Chatterjee's ICCV13 paper: CompareRotationGraph.m
 
@@ -114,7 +113,8 @@ def compare_rot_graph(R1, R2,method="median"):
             Ebest = E
             Emeanbest = E[0]
 
-
+    E_mean, E_median, E_var = Ebest[0].item(), Ebest[1].item(), Ebest[2].item()
+    
 
 
 
