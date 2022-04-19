@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-test/Gendarmenmarkt_gt.pt" 
+shape = [2031, 2031] 
+obs_path = "datasets/mat-test/Gendarmenmarkt_obs.pt" 
+dataset = "Gendarmenmarkt" 
+unobs_path = "datasets/mat-test/Gendarmenmarkt_unobs.pt" 
+incomp_path = "datasets/mat-test/Gendarmenmarkt_incomp.pt" 

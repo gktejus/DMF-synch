@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-test/Piazza_del_Popolo_gt.pt" 
+shape = [1014, 1014] 
+obs_path = "datasets/mat-test/Piazza_del_Popolo_obs.pt" 
+dataset = "Piazza_del_Popolo" 
+unobs_path = "datasets/mat-test/Piazza_del_Popolo_unobs.pt" 
+incomp_path = "datasets/mat-test/Piazza_del_Popolo_incomp.pt" 

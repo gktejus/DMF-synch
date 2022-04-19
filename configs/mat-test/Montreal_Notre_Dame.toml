@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-test/Montreal_Notre_Dame_gt.pt" 
+shape = [1350, 1350] 
+obs_path = "datasets/mat-test/Montreal_Notre_Dame_obs.pt" 
+dataset = "Montreal_Notre_Dame" 
+unobs_path = "datasets/mat-test/Montreal_Notre_Dame_unobs.pt" 
+incomp_path = "datasets/mat-test/Montreal_Notre_Dame_incomp.pt" 
