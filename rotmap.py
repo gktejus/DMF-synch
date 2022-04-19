@@ -7,6 +7,7 @@ import time
 import os
 from torch._C import dtype
 torchpi = torch.acos(torch.zeros(1)).item() * 2
+import scipy.sparse.linalg
 
 # original implementation from Chatterjee's ICCV13 paper: CompareRotationGraph.m
 
