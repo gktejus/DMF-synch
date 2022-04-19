@@ -36,7 +36,7 @@ class FLAGS(lz.BaseFLAGS):
     train_thres = 1.e-5
     loss_fn="l1"
     unobs_path=''
-
+    incomp_path=''
     hidden_sizes = []
 
     @classmethod
