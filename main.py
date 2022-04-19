@@ -35,6 +35,7 @@ class FLAGS(lz.BaseFLAGS):
     lr = 0.01
     train_thres = 1.e-5
     loss_fn="l1"
+    unobs_path=''
 
     hidden_sizes = []
 
@@ -146,7 +147,8 @@ class MatrixCompletion(BaseProblem):
     def __init__(self, *, gt_path, obs_path):
         self.w_gt = torch.load(gt_path, map_location=device)
         (self.us, self.vs), self.ys_ = torch.load(obs_path, map_location=device)
-
+        (self.us_unobs , self.vs_unobs) , self.ys_unobs_ = torch.load(unobs_path, map_location=device)
+        
     def get_train_loss(self, e2e,alpha = None , scale = None ,  criterion=None):
         self.ys = e2e[self.us, self.vs]
         residual = (self.ys - self.ys_).type(torch.float32)
