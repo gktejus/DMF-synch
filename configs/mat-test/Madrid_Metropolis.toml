@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-test/Madrid_Metropolis_gt.pt" 
+shape = [1023, 1023] 
+obs_path = "datasets/mat-test/Madrid_Metropolis_obs.pt" 
+dataset = "Madrid_Metropolis" 
+unobs_path = "datasets/mat-test/Madrid_Metropolis_unobs.pt" 
+incomp_path = "datasets/mat-test/Madrid_Metropolis_incomp.pt" 

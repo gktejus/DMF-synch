@@ -266,6 +266,7 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     else:
         raise ValueError
     #run_name = f"{FLAGS.dataset}_LR_{FLAGS.lr}_opt_{FLAGS.optimizer}_init_{FLAGS.initialization}_depth_{FLAGS.depth}_scale_{FLAGS.init_scale}"
+    wandb.login(key="820daa504d3cf600dccac1bb04d60169084da737")
     run = wandb.init(project="big-depth")
     wandb.config.lr = FLAGS.lr
     wandb.config.loss_fn=FLAGS.loss_fn

@@ -11,3 +11,5 @@ wrapt
 tinydb
 matplotlib
 fasteners
+gdown
+wandb
