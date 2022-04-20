@@ -41,7 +41,7 @@ class FLAGS(lz.BaseFLAGS):
     fraction_missing=0
     outlier_probabilty=0
     cameras=0
-    # project_name=""
+    project_name=''
     hidden_sizes = []
 
     @classmethod
@@ -177,9 +177,7 @@ class MatrixCompletion(BaseProblem):
             loss = criterion(self.ys.to(device).float(), self.ys_.float())
         else:
             loss = (self.ys.to(device) - self.ys_).pow(2).mean() # L2
-        # loss = torch.mean(robust_loss_pytorch.general.lossfun(residual,alpha =alpha  , scale = scale)) # Cauchy
-       # loss = criterion(self.ys.to(device).float() , self.ys_.float()) # Huber / L1
-        # loss = (self.ys.to(device) - self.ys_).pow(2).mean() # L2
+
 
         return (loss , residual)
 
@@ -189,9 +187,6 @@ class MatrixCompletion(BaseProblem):
             loss = criterion(self.w_gt , e2e.to(device)) # Huber / L1
         else:
             loss = (self.w_gt - e2e.to(device)).reshape(-1).pow(2).mean()
-        #loss = criterion(self.w_gt , e2e.to(device)) # Huber / L1
-        # loss = torch.mean(robust_loss_pytorch.general.lossfun(residual , alpha= alpha , scale = scale))
-        # loss = (self.w_gt - e2e.to(device)).reshape(-1).pow(2).mean()
 
         return loss , residual 
 
@@ -267,7 +262,7 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
         raise ValueError
     #run_name = f"{FLAGS.dataset}_LR_{FLAGS.lr}_opt_{FLAGS.optimizer}_init_{FLAGS.initialization}_depth_{FLAGS.depth}_scale_{FLAGS.init_scale}"
     wandb.login(key="***REMOVED***")
-    run = wandb.init(project="big-depth")
+    run = wandb.init(project=FLAGS.project_name)
     wandb.config.lr = FLAGS.lr
     wandb.config.loss_fn=FLAGS.loss_fn
     wandb.config.optimizer = FLAGS.optimizer
