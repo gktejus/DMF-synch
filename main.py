@@ -183,7 +183,7 @@ class MatrixCompletion(BaseProblem):
             reg = 0
             for i in range(0,e2e.shape[0],3):
                 for j in range(0,e2e.shape[0],3):
-                    reg+=torch.det(torch.matmul(e2e[i:i+3,j:j+3], e2e[i:i+3,j:j+3].T) - torch.ones(3).to(device))
+                    reg+=torch.det(torch.matmul(e2e[i:i+3,j:j+3], e2e[i:i+3,j:j+3].T) - torch.eye(3).to(device))
 
             loss = loss + FLAGS.add_reg*reg
         return (loss , residual)
