@@ -185,7 +185,7 @@ class MatrixCompletion(BaseProblem):
                 for j in range(0,e2e.shape[0],3):
                     reg+=torch.det(torch.matmul(e2e[i:i+3,j:j+3], e2e[i:i+3,j:j+3].T) - torch.ones(3).to(device))
 
-            loss = loss + add_reg*reg
+            loss = loss + FLAGS.add_reg*reg
         return (loss , residual)
 
     def get_test_loss(self, e2e,alpha = None  , scale = None ,criterion=None):
