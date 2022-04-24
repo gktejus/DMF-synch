@@ -42,6 +42,7 @@ class FLAGS(lz.BaseFLAGS):
     outlier_probabilty=0
     cameras=0
     project_name=''
+    add_reg=0
     hidden_sizes = []
 
     @classmethod
@@ -178,7 +179,13 @@ class MatrixCompletion(BaseProblem):
         else:
             loss = (self.ys.to(device) - self.ys_).pow(2).mean() # L2
 
+        if FLAGS.add_reg>0:
+            reg = 0
+            for i in range(0,e2e.shape[0],3):
+                for j in range(0,e2e.shape[0],3):
+                    reg+=torch.det(torch.matmul(e2e[i:i+3,j:j+3], e2e[i:i+3,j:j+3].T) - torch.ones(3).to(device))
 
+            loss = loss + add_reg*reg
         return (loss , residual)
 
     def get_test_loss(self, e2e,alpha = None  , scale = None ,criterion=None):
