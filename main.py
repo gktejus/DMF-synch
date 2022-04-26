@@ -281,7 +281,7 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     wandb.config.cameras = FLAGS.cameras
     wandb.config.outlier_probability = FLAGS.outlier_probabilty
     wandb.config.fraction_missing = FLAGS.fraction_missing
-
+    wandb.config.reg_lambda = FLAGS.add_reg
    
     log_path =  _fs.resolve("$LOGDIR")
     new_file_dir = os.path.join(log_path , "X_output.mat")
