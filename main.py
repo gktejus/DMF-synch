@@ -170,7 +170,8 @@ class MatrixCompletion(BaseProblem):
         (self.us, self.vs), self.ys_ = torch.load(obs_path, map_location=device)
         (self.us_un , self.vs_un) , self.ys_un = torch.load(unobs_path ,map_location=device )
         # self.incomp_mat = torch.load(incomp_path, map_location=device)
-
+        self.unfold = torch.nn.Unfold(kernel_size = 3, stride = 3)
+        
     def get_train_loss(self, e2e,alpha = None , scale = None ,  criterion=None):
         self.ys = e2e[self.us, self.vs]
         residual = (self.ys - self.ys_).type(torch.float32)
@@ -180,10 +181,8 @@ class MatrixCompletion(BaseProblem):
             loss = (self.ys.to(device) - self.ys_).pow(2).mean() # L2
 
         if FLAGS.add_reg>0:
-            reg = 0
-            for i in range(0,e2e.shape[0],3):
-                for j in range(0,e2e.shape[0],3):
-                    reg+=torch.det(torch.matmul(e2e[i:i+3,j:j+3], e2e[i:i+3,j:j+3].T) - torch.eye(3).to(device))
+            out = self.unfold(e2e.unsqueeze(0).unsqueeze(0).float())[0].T.reshape([-1,3,3])
+            reg = torch.norm(torch.matmul(out , out.permute(1,2,0).T) - torch.eye(3).to(device),2)
 
             loss = loss + FLAGS.add_reg*reg
         return (loss , residual)
