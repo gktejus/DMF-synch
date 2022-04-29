@@ -182,7 +182,7 @@ class MatrixCompletion(BaseProblem):
 
         if FLAGS.add_reg>0:
             out = self.unfold(e2e.unsqueeze(0).unsqueeze(0).float())[0].T.reshape([-1,3,3])
-            reg = torch.norm(torch.matmul(out , out.permute(1,2,0).T) - torch.eye(3).to(device),2)
+            reg = torch.norm(torch.matmul(out , out.permute(1,2,0).T) - torch.eye(3).to(device),p=2 , dim = (1,2)).mean()
 
             loss = loss + FLAGS.add_reg*reg
         return (loss , residual)
