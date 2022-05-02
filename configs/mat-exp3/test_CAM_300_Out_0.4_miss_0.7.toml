@@ -1,0 +1,9 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-exp3/test_CAM_300_Out_0.4_miss_0.7_gt.pt" 
+shape = [900, 900] 
+obs_path = "datasets/mat-exp3/test_CAM_300_Out_0.4_miss_0.7_obs.pt" 
+dataset = "test_CAM_300_Out_0.4_miss_0.7" 
+unobs_path = "datasets/mat-exp3/test_CAM_300_Out_0.4_miss_0.7_unobs.pt" 
+fraction_missing = 0.7 
+outlier_probabilty = 0.4 
+cameras = 300 
