@@ -318,8 +318,8 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
         criterion = None
     
     
-    ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['R_gt_c'].transpose(2,0,1))
-    ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['ncams_c'][0][0]
+    ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_exp3/", dataset+".mat"))['R_gt'].transpose(2,0,1))
+    ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_exp3/", dataset+".mat"))['nviews'][0][0]
     method = "median"
     
     for T in range(n_iters):
