@@ -43,6 +43,7 @@ class FLAGS(lz.BaseFLAGS):
     cameras=0
     project_name=''
     add_reg=0
+    is_synthetic=False
     hidden_sizes = []
 
     @classmethod
@@ -136,29 +137,7 @@ class BaseProblem:
         pass
 
 
-@FLAGS.inject
-def cvx_opt(prob: BaseProblem, *, shape, _log: Logger, _writer: SummaryWriter, _fs: FileStorage):
-    x = cvx.Variable(shape=shape)
 
-    objective = cvx.Minimize(cvx.norm(x, 'nuc'))
-    constraints = prob.get_cvx_opt_constraints(x)
-
-    problem = cvx.Problem(objective, constraints)
-    problem.solve(solver=cvx.SCS, verbose=True, use_indirect=False)
-    e2e = torch.from_numpy(x.value).float()
-
-    train_loss = prob.get_train_loss(e2e)
-    test_loss = prob.get_test_loss(e2e)
-
-    nuc_norm = e2e.norm('nuc')
-    _log.info(f"train loss = {train_loss.item():.3e}, "
-              f"test error = {test_loss.item():.3e}, "
-              f"nuc_norm = {nuc_norm.item():.3f}")
-    _writer.add_scalar('loss/train', train_loss.item())
-    _writer.add_scalar('loss/test', test_loss.item())
-    _writer.add_scalar('nuc_norm', nuc_norm.item())
-
-    torch.save(e2e, _fs.resolve('$LOGDIR/nuclear.npy'))
 
 
 class MatrixCompletion(BaseProblem):
@@ -172,7 +151,7 @@ class MatrixCompletion(BaseProblem):
         # self.incomp_mat = torch.load(incomp_path, map_location=device)
         self.unfold = torch.nn.Unfold(kernel_size = 3, stride = 3)
         
-    def get_train_loss(self, e2e,alpha = None , scale = None ,  criterion=None):
+    def get_train_loss(self, e2e,  criterion=None):
         self.ys = e2e[self.us, self.vs]
         residual = (self.ys - self.ys_).type(torch.float32)
         if FLAGS.loss_fn=="l1":
@@ -187,7 +166,7 @@ class MatrixCompletion(BaseProblem):
             loss = loss + FLAGS.add_reg*reg
         return (loss , residual)
 
-    def get_test_loss(self, e2e,alpha = None  , scale = None ,criterion=None):
+    def get_test_loss(self, e2e ,criterion=None):
         residual = (e2e.to(device)- self.w_gt ).reshape(-1)
         if FLAGS.loss_fn == "l1":
             loss = criterion(self.w_gt , e2e.to(device)) # Huber / L1
@@ -226,15 +205,6 @@ class MatrixCompletion(BaseProblem):
         d_e2e = d_e2e / len(self.ys_)
         return d_e2e
 
-    @FLAGS.inject
-    def get_cvx_opt_constraints(self, x, shape):
-        A = np.zeros(shape)
-        mask = np.zeros(shape)
-        A[self.us.cpu(), self.vs.cpu()] = self.ys_.cpu()
-        mask[self.us.cpu(), self.vs.cpu()] = 1
-        eps = 1.e-3
-        constraints = [cvx.abs(cvx.multiply(x - A, mask)) <= eps]
-        return constraints
 
 
 
@@ -261,12 +231,10 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
         optimizer = GroupRMSprop(model.parameters(), FLAGS.lr, eps=1e-4)
     elif FLAGS.optimizer == 'Adam':
         optimizer = optim.Adam(model.parameters(), FLAGS.lr)
-    elif FLAGS.optimizer == 'cvxpy':
-        cvx_opt(prob)
-        return
     else:
         raise ValueError
-    #run_name = f"{FLAGS.dataset}_LR_{FLAGS.lr}_opt_{FLAGS.optimizer}_init_{FLAGS.initialization}_depth_{FLAGS.depth}_scale_{FLAGS.init_scale}"
+    
+
     wandb.login(key="820daa504d3cf600dccac1bb04d60169084da737")
     run = wandb.init(project=FLAGS.project_name)
     wandb.config.lr = FLAGS.lr
@@ -283,30 +251,13 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     wandb.config.fraction_missing = FLAGS.fraction_missing
     wandb.config.reg_lambda = FLAGS.add_reg
    
-    log_path =  _fs.resolve("$LOGDIR")
-    new_file_dir = os.path.join(log_path , "X_output.mat")
-    config_path = os.path.join(log_path, "config.toml")
-    with open(config_path) as f:
-        lines = f.readlines()
-    dataset = lines[3].strip('\n').split("= ")[1].replace('"', '')
-    depth = int(lines[4].strip('\n').split("= ")[1])
-    init_scale = float(lines[8].strip('\n').split("= ")[1])
-    optimizer_ = lines[12].strip('\n').split("= ")[1].replace('"', '')
-    initialization  = lines[13].strip('\n').split("= ")[1].replace('"','')
-    lr = float(lines[14].strip('\n').split("= ")[1])
-    delta = float(lines[11].strip('\n').split("= ")[1])
-    config_dic = {"depth":depth , "init_scale": init_scale , "optimizer":optimizer_ , "initialization":initialization , "lr":lr, "dataset":dataset , "delta":delta}
 
-    json_path = os.path.join(log_path, "config.json")
-    with open(json_path, 'w') as fp:
-        json.dump(config_dic, fp)
-  
+      
     config = wandb.config
     init_model(model)
     wandb.watch(model)
     loss = None
-    alpha = torch.Tensor([0]).to(device)
-    scale = torch.Tensor([0.1]).to(device)
+    
 
     best_E_mean  = 999999
     best_E_var = 0
@@ -317,24 +268,25 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     else:
         criterion = None
     
+    if FLAGS.is_synthetic:
+        ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/dataset_synthetic/", FLAGS.dataset+".mat"))['R_gt'].transpose(2,0,1))
+        ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_matrices/", FLAGS.dataset+".mat"))['ncams'][0][0]
+    else:
+        ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", FLAGS.dataset+".mat"))['R_gt_c'].transpose(2,0,1))
+        ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_matrices/", FLAGS.dataset+".mat"))['ncams_c'][0][0]
     
-    ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['R_gt_c'].transpose(2,0,1))
-    ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_matrices/", dataset+".mat"))['ncams_c'][0][0]
     method = "median"
-    
     for T in range(n_iters):
-        # return get_e2e(self.net,self.input+t.randn(self.input.shape).cuda()*1e-2)
         e2e = get_e2e(model)
-        #e2e = get_e2e_rand(model, prob.incomp_mat +torch.randn(prob.incomp_mat.shape).to(device)*1e-2)
 
-        loss, residual_train = prob.get_train_loss(e2e, alpha = alpha , scale = scale, criterion = criterion )
+        loss, residual_train = prob.get_train_loss(e2e , criterion = criterion )
         
         optimizer.zero_grad()
         loss.backward()
 
         wandb.log({"train_loss":loss.item()})
         with torch.no_grad():
-            test_loss , residual_test= prob.get_test_loss(e2e, alpha = alpha , scale = scale, criterion = criterion)
+            test_loss , residual_test= prob.get_test_loss(e2e , criterion = criterion)
             unobs_loss = prob.unobserved_loss(e2e , criterion)
            
 
