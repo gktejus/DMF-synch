@@ -270,7 +270,7 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
     
     if FLAGS.is_synthetic:
         ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/dataset_synthetic/", FLAGS.dataset+".mat"))['R_gt'].transpose(2,0,1))
-        ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/dataset_synthetic/", FLAGS.dataset+".mat"))['ncams'][0][0]
+        ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/dataset_synthetic/", FLAGS.dataset+".mat"))['nviews'][0][0]
     else:
         ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", FLAGS.dataset+".mat"))['R_gt_c'].transpose(2,0,1))
         ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_matrices/", FLAGS.dataset+".mat"))['ncams_c'][0][0]
