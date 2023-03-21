@@ -19,13 +19,10 @@ class FLAGS(lz.BaseFLAGS):
     obs_path = ''
     dataset = ''
     depth = 1
-    n_train_samples = 0
     n_iters = 1000000
     n_dev_iters = max(1, n_iters // 1000)
     init_scale = 0.001  # average magnitude of entries
     shape = [0, 0]
-    n_singulars_save = 0
-    delta = 1
     optimizer = 'GroupRMSprop'
     initialization = 'gaussian'  # `orthogonal` or `identity` or `gaussian`
     lr = 0.01
@@ -33,10 +30,6 @@ class FLAGS(lz.BaseFLAGS):
     loss_fn="l1"
     unobs_path= ''
     gt_mat=''
-    fraction_missing=0
-    outlier_probabilty=0
-    cameras=0
-    project_name=''
     add_reg=0
     is_synthetic=False
     hidden_sizes = []
@@ -122,7 +115,7 @@ class MatrixCompletion(BaseProblem):
         (self.us_un , self.vs_un) , self.ys_un = torch.load(unobs_path ,map_location=device )
         self.unfold = torch.nn.Unfold(kernel_size = 3, stride = 3)
         self.ground_truth = torch.from_numpy(scipy.io.loadmat(gt_mat)['R_gt_c'].transpose(2,0,1))
-        self.ncams = torch.from_numpy(scipy.io.loadmat(gt_mat)['ncams_c'][0][0]
+        self.ncams = scipy.io.loadmat(gt_mat)['ncams_c'][0][0]
         
     def get_train_loss(self, e2e,  criterion=None):
         self.ys = e2e[self.us, self.vs]
@@ -166,12 +159,6 @@ class MatrixCompletion(BaseProblem):
         return d_e2e
 
 
-
-
-
-
-
-
 @lz.main(FLAGS)
 @FLAGS.inject
 def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _writer, _info, _fs):
@@ -207,13 +194,6 @@ def main(*, depth, hidden_sizes, n_iters, problem, train_thres, _seed, _log, _wr
         criterion = torch.nn.L1Loss()
     else:
         criterion = None
-    
-    # if FLAGS.is_synthetic:
-    #     ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/dataset_synthetic/", FLAGS.dataset+".mat"))['R_gt'].transpose(2,0,1))
-    #     ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/dataset_synthetic/", FLAGS.dataset+".mat"))['nviews'][0][0]
-    # else:
-    #     ground_truth = torch.from_numpy(scipy.io.loadmat(os.path.join("./MATLAB_SO3/datasets_matrices/", FLAGS.dataset+".mat"))['R_gt_c'].transpose(2,0,1))
-    #     ncams = scipy.io.loadmat(os.path.join( "./MATLAB_SO3/datasets_matrices/", FLAGS.dataset+".mat"))['ncams_c'][0][0]
     
     method = "median"
     for T in range(n_iters):
