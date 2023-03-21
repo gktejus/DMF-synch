@@ -1,0 +1,5 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-cmpl/Piazza_del_Popolo_gt.pt" 
+shape = [1014, 1014] 
+obs_path = "datasets/mat-cmpl/Piazza_del_Popolo_obs.pt" 
+dataset = "Piazza_del_Popolo" 

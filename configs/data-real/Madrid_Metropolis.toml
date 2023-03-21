@@ -1,7 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/data-real/Madrid_Metropolis_gt.pt" 
-shape = [1023, 1023] 
-obs_path = "datasets/data-real/Madrid_Metropolis_obs.pt" 
-dataset = "Madrid_Metropolis" 
-unobs_path = "datasets/data-real/Madrid_Metropolis_unobs.pt" 
-gt_mat = "datasets/datasets_matrices/Madrid_Metropolis.mat"

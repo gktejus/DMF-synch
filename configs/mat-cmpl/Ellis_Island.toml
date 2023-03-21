@@ -1,0 +1,5 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-cmpl/Ellis_Island_gt.pt" 
+shape = [681, 681] 
+obs_path = "datasets/mat-cmpl/Ellis_Island_obs.pt" 
+dataset = "Ellis_Island" 

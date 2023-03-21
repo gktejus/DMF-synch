@@ -1,0 +1,5 @@
+problem = "matrix-completion" 
+gt_path = "datasets/mat-cmpl/Union_Square_gt.pt" 
+shape = [2367, 2367] 
+obs_path = "datasets/mat-cmpl/Union_Square_obs.pt" 
+dataset = "Union_Square" 

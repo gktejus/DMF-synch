@@ -1,0 +1,4 @@
+problem = "matrix-completion"
+gt_path = "datasets/mat-cmpl/gt.pt"
+shape = [681, 681]
+obs_path = "datasets/mat-cmpl/362223.pt"

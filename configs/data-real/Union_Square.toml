@@ -1,7 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/data-real/Union_Square_gt.pt" 
-shape = [2367, 2367] 
-obs_path = "datasets/data-real/Union_Square_obs.pt" 
-dataset = "Union_Square" 
-unobs_path = "datasets/data-real/Union_Square_unobs.pt" 
-gt_mat = "datasets/datasets_matrices/Union_Square.mat"
