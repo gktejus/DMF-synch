@@ -1,5 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-cmpl/Trafalgar_gt.pt" 
-shape = [15174, 15174] 
-obs_path = "datasets/mat-cmpl/Trafalgar_obs.pt" 
-dataset = "Trafalgar" 

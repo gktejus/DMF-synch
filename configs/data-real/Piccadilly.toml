@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/data-real/Piccadilly_gt.pt" 
+shape = [6456, 6456] 
+obs_path = "datasets/data-real/Piccadilly_obs.pt" 
+dataset = "Piccadilly" 
+unobs_path = "datasets/data-real/Piccadilly_unobs.pt" 
+gt_mat = "datasets/datasets_matrices/Piccadilly.mat"

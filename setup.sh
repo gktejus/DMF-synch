@@ -1,3 +1,4 @@
+#!/bin/bash
 pip install -r requirements.txt
 mkdir datasets
 gdown --id 17rVoMcJOS-8Zh_0R82Qm4Z7aIpenikBE
