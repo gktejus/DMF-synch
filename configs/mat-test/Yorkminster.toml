@@ -1,7 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-test/Yorkminster_gt.pt" 
-shape = [1311, 1311] 
-obs_path = "datasets/mat-test/Yorkminster_obs.pt" 
-dataset = "Yorkminster" 
-unobs_path = "datasets/mat-test/Yorkminster_unobs.pt" 
-incomp_path = "datasets/mat-test/Yorkminster_incomp.pt" 

@@ -1,7 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-test/Roman_Forum_gt.pt" 
-shape = [3252, 3252] 
-obs_path = "datasets/mat-test/Roman_Forum_obs.pt" 
-dataset = "Roman_Forum" 
-unobs_path = "datasets/mat-test/Roman_Forum_unobs.pt" 
-incomp_path = "datasets/mat-test/Roman_Forum_incomp.pt" 

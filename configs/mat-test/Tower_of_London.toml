@@ -1,7 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-test/Tower_of_London_gt.pt" 
-shape = [1416, 1416] 
-obs_path = "datasets/mat-test/Tower_of_London_obs.pt" 
-dataset = "Tower_of_London" 
-unobs_path = "datasets/mat-test/Tower_of_London_unobs.pt" 
-incomp_path = "datasets/mat-test/Tower_of_London_incomp.pt" 

@@ -1,7 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-test/NYC_Library_gt.pt" 
-shape = [996, 996] 
-obs_path = "datasets/mat-test/NYC_Library_obs.pt" 
-dataset = "NYC_Library" 
-unobs_path = "datasets/mat-test/NYC_Library_unobs.pt" 
-incomp_path = "datasets/mat-test/NYC_Library_incomp.pt" 

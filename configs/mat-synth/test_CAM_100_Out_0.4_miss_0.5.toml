@@ -1,9 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-synth/test_CAM_100_Out_0.4_miss_0.5_gt.pt" 
-shape = [300, 300] 
-obs_path = "datasets/mat-synth/test_CAM_100_Out_0.4_miss_0.5_obs.pt" 
-dataset = "test_CAM_100_Out_0.4_miss_0.5" 
-unobs_path = "datasets/mat-synth/test_CAM_100_Out_0.4_miss_0.5_unobs.pt" 
-fraction_missing = 0.5 
-outlier_probabilty = 0.4 
-cameras = 100 
