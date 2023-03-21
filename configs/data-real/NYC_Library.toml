@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/data-real/NYC_Library_gt.pt" 
+shape = [996, 996] 
+obs_path = "datasets/data-real/NYC_Library_obs.pt" 
+dataset = "NYC_Library" 
+unobs_path = "datasets/data-real/NYC_Library_unobs.pt" 
+gt_mat = "datasets/datasets_matrices/NYC_Library.mat"

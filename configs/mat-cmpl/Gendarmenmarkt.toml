@@ -1,5 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-cmpl/Gendarmenmarkt_gt.pt" 
-shape = [2031, 2031] 
-obs_path = "datasets/mat-cmpl/Gendarmenmarkt_obs.pt" 
-dataset = "Gendarmenmarkt" 

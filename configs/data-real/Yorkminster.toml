@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/data-real/Yorkminster_gt.pt" 
+shape = [1311, 1311] 
+obs_path = "datasets/data-real/Yorkminster_obs.pt" 
+dataset = "Yorkminster" 
+unobs_path = "datasets/data-real/Yorkminster_unobs.pt" 
+gt_mat = "datasets/datasets_matrices/Yorkminster.mat"

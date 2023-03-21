@@ -1,3 +1,0 @@
-n = 100
-rank = 5
-gt_path = "datasets/mat-cmpl/gt.pt"
