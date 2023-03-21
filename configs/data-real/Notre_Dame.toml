@@ -1,0 +1,7 @@
+problem = "matrix-completion" 
+gt_path = "datasets/data-real/Notre_Dame_gt.pt" 
+shape = [1659, 1659] 
+obs_path = "datasets/data-real/Notre_Dame_obs.pt" 
+dataset = "Notre_Dame" 
+unobs_path = "datasets/data-real/Notre_Dame_unobs.pt" 
+gt_mat = "datasets/datasets_matrices/Notre_Dame.mat"

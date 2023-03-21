@@ -1,5 +1,0 @@
-problem = "matrix-completion" 
-gt_path = "datasets/mat-cmpl/NYC_Library_gt.pt" 
-shape = [996, 996] 
-obs_path = "datasets/mat-cmpl/NYC_Library_obs.pt" 
-dataset = "NYC_Library" 

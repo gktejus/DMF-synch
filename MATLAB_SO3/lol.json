@@ -1,8 +1,0 @@
-{
-	"depth" : 2,
-	"init_scale" : 0.001,
-	"optimizer" : "GroupRMSprop",
-	"initialization" : "orthogonal",
-	"lr" : 0.001,
-	"ada" : "XXX"
-	}
