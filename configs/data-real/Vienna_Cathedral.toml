@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "datasets/data-real/Vienna_Cathedral_gt.pt" 
+gt_path = "data/data-real/Vienna_Cathedral_gt.pt" 
 shape = [2508, 2508] 
-obs_path = "datasets/data-real/Vienna_Cathedral_obs.pt" 
+obs_path = "data/data-real/Vienna_Cathedral_obs.pt" 
 dataset = "Vienna_Cathedral" 
-unobs_path = "datasets/data-real/Vienna_Cathedral_unobs.pt" 
-gt_mat = "datasets/datasets_matrices/Vienna_Cathedral.mat"
+unobs_path = "data/data-real/Vienna_Cathedral_unobs.pt" 
+gt_mat = "data/datasets_matrices/Vienna_Cathedral.mat"

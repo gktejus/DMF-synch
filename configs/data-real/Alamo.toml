@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "datasets/data-real/Alamo_gt.pt" 
+gt_path = "data/data-real/Alamo_gt.pt" 
 shape = [1731, 1731] 
-obs_path = "datasets/data-real/Alamo_obs.pt" 
+obs_path = "data/data-real/Alamo_obs.pt" 
 dataset = "Alamo" 
-unobs_path = "datasets/data-real/Alamo_unobs.pt" 
-gt_mat = "datasets/datasets_matrices/Alamo.mat"
+unobs_path = "data/data-real/Alamo_unobs.pt" 
+gt_mat = "data/datasets_matrices/Alamo.mat"

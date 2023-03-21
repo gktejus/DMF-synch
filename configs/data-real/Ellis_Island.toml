@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "datasets/data-real/Ellis_Island_gt.pt" 
+gt_path = "data/data-real/Ellis_Island_gt.pt" 
 shape = [681, 681] 
-obs_path = "datasets/data-real/Ellis_Island_obs.pt" 
+obs_path = "data/data-real/Ellis_Island_obs.pt" 
 dataset = "Ellis_Island" 
-unobs_path = "datasets/data-real/Ellis_Island_unobs.pt" 
-gt_mat = "datasets/datasets_matrices/Ellis_Island.mat"
+unobs_path = "data/data-real/Ellis_Island_unobs.pt" 
+gt_mat = "data/datasets_matrices/Ellis_Island.mat"

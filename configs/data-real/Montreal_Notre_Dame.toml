@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "datasets/data-real/Montreal_Notre_Dame_gt.pt" 
+gt_path = "data/data-real/Montreal_Notre_Dame_gt.pt" 
 shape = [1350, 1350] 
-obs_path = "datasets/data-real/Montreal_Notre_Dame_obs.pt" 
+obs_path = "data/data-real/Montreal_Notre_Dame_obs.pt" 
 dataset = "Montreal_Notre_Dame" 
-unobs_path = "datasets/data-real/Montreal_Notre_Dame_unobs.pt" 
-gt_mat = "datasets/datasets_matrices/Montreal_Notre_Dame.mat"
+unobs_path = "data/data-real/Montreal_Notre_Dame_unobs.pt" 
+gt_mat = "data/datasets_matrices/Montreal_Notre_Dame.mat"
