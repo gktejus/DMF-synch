@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "data/data-real/Roman_Forum_gt.pt" 
+gt_path = "datasets/data-real/Roman_Forum_gt.pt" 
 shape = [3252, 3252] 
-obs_path = "data/data-real/Roman_Forum_obs.pt" 
+obs_path = "datasets/data-real/Roman_Forum_obs.pt" 
 dataset = "Roman_Forum" 
-unobs_path = "data/data-real/Roman_Forum_unobs.pt" 
-gt_mat = "data/datasets_matrices/Roman_Forum.mat"
+unobs_path = "datasets/data-real/Roman_Forum_unobs.pt" 
+gt_mat = "datasets/data-real-mat/Roman_Forum.mat"

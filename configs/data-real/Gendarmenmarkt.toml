@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "data/data-real/Gendarmenmarkt_gt.pt" 
+gt_path = "datasets/data-real/Gendarmenmarkt_gt.pt" 
 shape = [2031, 2031] 
-obs_path = "data/data-real/Gendarmenmarkt_obs.pt" 
+obs_path = "datasets/data-real/Gendarmenmarkt_obs.pt" 
 dataset = "Gendarmenmarkt" 
-unobs_path = "data/data-real/Gendarmenmarkt_unobs.pt" 
-gt_mat = "data/datasets_matrices/Gendarmenmarkt.mat"
+unobs_path = "datasets/data-real/Gendarmenmarkt_unobs.pt" 
+gt_mat = "datasets/data-real-mat/Gendarmenmarkt.mat"

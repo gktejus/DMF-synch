@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "data/data-real/Piazza_del_Popolo_gt.pt" 
+gt_path = "datasets/data-real/Piazza_del_Popolo_gt.pt" 
 shape = [1014, 1014] 
-obs_path = "data/data-real/Piazza_del_Popolo_obs.pt" 
+obs_path = "datasets/data-real/Piazza_del_Popolo_obs.pt" 
 dataset = "Piazza_del_Popolo" 
-unobs_path = "data/data-real/Piazza_del_Popolo_unobs.pt" 
-gt_mat = "data/datasets_matrices/Piazza_del_Popolo.mat"
+unobs_path = "datasets/data-real/Piazza_del_Popolo_unobs.pt" 
+gt_mat = "datasets/data-real-mat/Piazza_del_Popolo.mat"

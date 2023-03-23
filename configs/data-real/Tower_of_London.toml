@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "data/data-real/Tower_of_London_gt.pt" 
+gt_path = "datasets/data-real/Tower_of_London_gt.pt" 
 shape = [1416, 1416] 
-obs_path = "data/data-real/Tower_of_London_obs.pt" 
+obs_path = "datasets/data-real/Tower_of_London_obs.pt" 
 dataset = "Tower_of_London" 
-unobs_path = "data/data-real/Tower_of_London_unobs.pt" 
-gt_mat = "data/datasets_matrices/Tower_of_London.mat"
+unobs_path = "datasets/data-real/Tower_of_London_unobs.pt" 
+gt_mat = "datasets/data-real-mat/Tower_of_London.mat"

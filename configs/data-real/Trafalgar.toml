@@ -1,7 +1,7 @@
 problem = "matrix-completion" 
-gt_path = "data/data-real/Trafalgar_gt.pt" 
+gt_path = "datasets/data-real/Trafalgar_gt.pt" 
 shape = [15174, 15174] 
-obs_path = "data/data-real/Trafalgar_obs.pt" 
+obs_path = "datasets/data-real/Trafalgar_obs.pt" 
 dataset = "Trafalgar" 
-unobs_path = "data/data-real/Trafalgar_unobs.pt" 
-gt_mat = "data/datasets_matrices/Trafalgar.mat"
+unobs_path = "datasets/data-real/Trafalgar_unobs.pt" 
+gt_mat = "datasets/data-real-mat/Trafalgar.mat"
