@@ -1,8 +1,6 @@
 numpy
 ipdb
 gitpython
-cvxpy
-cvxopt
 coloredlogs
 toml==0.10.0
 tensorboard
