@@ -1,4 +1,3 @@
-from matplotlib.pyplot import inferno
 import numpy as np
 import scipy
 import torch
