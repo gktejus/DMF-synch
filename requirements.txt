@@ -1,4 +1,6 @@
+torch
 numpy
+scipy
 ipdb
 gitpython
 coloredlogs
@@ -7,7 +9,5 @@ tensorboard
 tensorboardX
 wrapt
 tinydb
-matplotlib
 fasteners
 gdown
-wandb
