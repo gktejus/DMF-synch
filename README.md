@@ -1,7 +1,11 @@
 # Rotation Synchronization via Deep Matrix Factorization
 
+#### GK Tejus, Giacomo Zara, Paolo Rota, Andrea Fusiello, Elisa Ricci, Federica Arrigoni
+
+
+
 This is the official Code for the paper[
-Rotation Synchronization via Deep Matrix Factorization](https://github.com/gktejus/DMF-Synch) presented at ICRA 2023. 
+Rotation Synchronization via Deep Matrix Factorization](https://arxiv.org/abs/2305.05268) presented at ICRA 2023. 
 
 ## Setup
 
@@ -98,3 +102,18 @@ To run multiple experiments with multiple hyperparameters sequentially, you can 
     --replace INIT=gaussian
 ```
 
+## Citation
+
+If you found our work useful and use it in your research, please consider citing our paper.
+    
+    @misc{tejus2023rotation,
+      title={Rotation Synchronization via Deep Matrix Factorization}, 
+      author={Gk Tejus and Giacomo Zara and Paolo Rota and Andrea Fusiello and Elisa Ricci and Federica Arrigoni},
+      year={2023},
+      eprint={2305.05268},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+    }
+
+
+If you have any questions regarding the code, please raise an issue or [reach out](mailto:gktejus@gmail.com) to me.
